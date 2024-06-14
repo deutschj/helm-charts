@@ -1,6 +1,6 @@
 {{- if and .Values.kubeScheduler.enabled .Values.kubeScheduler.endpoints .Values.kubernetesServiceMonitors.enabled }}
 apiVersion: v1
-kind: Endpoints
+kind: EndpointSlice
 metadata:
   name: {{ template "kube-prometheus-stack.fullname" . }}-kube-scheduler
   labels:
@@ -8,10 +8,11 @@ metadata:
     k8s-app: kube-scheduler
 {{ include "kube-prometheus-stack.labels" . | indent 4 }}
   namespace: kube-system
-subsets:
+addressType: FQDN
+endpoints:
   - addresses:
       {{- range .Values.kubeScheduler.endpoints }}
-      - ip: {{ . }}
+      - {{ . }}
       {{- end }}
     ports:
       - name: {{ .Values.kubeScheduler.serviceMonitor.port }}
